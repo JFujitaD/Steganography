@@ -23,8 +23,13 @@ public class Chunk {
 		chunkType = d1 | d2 | d3 | d4;
 		
 		// Data is "length" bytes
+		int dataStartIndex = 8;
 		data = new byte[length];
 		
+		for(int i = dataStartIndex; i < dataStartIndex + length; i++) {
+			data[i - dataStartIndex] = bytes[i];
+		}
+
 		// CRC-32 is the last 4 bytes
 		int endIndex = bytes.length - 1;
 		d1 = (bytes[endIndex - 3] & 0xff) << 24;
@@ -33,5 +38,9 @@ public class Chunk {
 		d4 = (bytes[endIndex] & 0xff);
 
 		crc32 = d1 | d2 | d3 | d4;
+	}
+	
+	public byte[] getData() {
+		return data;
 	}
 }
