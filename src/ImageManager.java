@@ -29,9 +29,11 @@ public class ImageManager {
 			imageInformation = new ImageInformation(ihdrChunk.getData());
 			
 			// Intermediate Chunk
-			byte[] chunkLengthBytes = iStream.readNBytes(4);
-			int chunkLengthInt = Chunk.getLengthFromBytes(chunkLengthBytes);
-			iStream.readNBytes(chunkLengthInt);
+			for(int i = 0; i < 4; i++) {
+				byte[] chunkLengthBytes = iStream.readNBytes(4);
+				int chunkLengthInt = Chunk.getLengthFromBytes(chunkLengthBytes);
+				iStream.readNBytes(chunkLengthInt);
+			}
 			
 			// IDAT Chunk
 			byte[] idatLengthBytes = iStream.readNBytes(4);
