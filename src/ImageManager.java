@@ -1,10 +1,6 @@
 import java.util.*;
 import java.io.*;
 
-// IHDR: 49 48 44 52
-// IDAT: 49 44 41 54
-// IEND: 49 45 4E 44
-
 public class ImageManager {
 	private final int HEADER_SIZE = 8;
 	

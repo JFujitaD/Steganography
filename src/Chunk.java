@@ -58,6 +58,31 @@ public class Chunk {
 		return collectiveBytes;
 	}
 	
+	public boolean isIHDR() {
+		return isCorrectChunk(ChunkType.IHDR);
+	}
+	
+	public boolean isIDAT() {
+		return isCorrectChunk(ChunkType.IDAT);
+	}
+	
+	public boolean isIEND() {
+		return isCorrectChunk(ChunkType.IEND);
+	}
+	
+	private boolean isCorrectChunk(ChunkType type) {
+		StringBuilder sb = new StringBuilder();
+		
+		for(byte b : chunkType) {
+			int lastEight = b & 0xff;
+			sb.append((char)lastEight);
+		}
+		
+		if(sb.toString().equals(type.toString()))
+			return true;
+		return false;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("-Chunk-");
