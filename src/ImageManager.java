@@ -28,6 +28,11 @@ public class ImageManager {
 			// Image Information
 			imageInformation = new ImageInformation(ihdrChunk.getData());
 			
+			// Intermediate Chunk
+			byte[] chunkLengthBytes = iStream.readNBytes(4);
+			int chunkLengthInt = Chunk.getLengthFromBytes(chunkLengthBytes);
+			iStream.readNBytes(chunkLengthInt);
+			
 			// IDAT Chunk
 			byte[] idatLengthBytes = iStream.readNBytes(4);
 			int idatLengthInt = Chunk.getLengthFromBytes(idatLengthBytes);
@@ -66,7 +71,7 @@ public class ImageManager {
 		
 		for(byte d : data) {
 			int lastEight = d & 0xff;
-			sb.append(lastEight + "\n");
+			sb.append("0x" + Integer.toHexString(lastEight) + "\n");
 		}
 
 		System.out.println(sb.toString());
