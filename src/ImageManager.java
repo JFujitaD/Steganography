@@ -1,3 +1,4 @@
+import java.util.*;
 import java.io.*;
 
 // IHDR: 49 48 44 52
@@ -6,7 +7,6 @@ import java.io.*;
 
 public class ImageManager {
 	private final int HEADER_SIZE = 8;
-	private final int IHDR_SIZE = 25;
 	
 	private File path;
 	private InputStream iStream;
@@ -14,7 +14,7 @@ public class ImageManager {
 	private ImageInformation imageInformation;
 	private byte[] header = new byte[HEADER_SIZE];
 	private Chunk ihdrChunk;
-	private Chunk[] miscChunks;
+	private List<Chunk> miscChunks = new ArrayList<>();
 	private Chunk idatChunk;
 	private Chunk iendChunk;
 	
@@ -28,60 +28,52 @@ public class ImageManager {
 			header = iStream.readNBytes(HEADER_SIZE);
 			
 			// IHDR Chunk
-			byte[] ihdrBytes = iStream.readNBytes(IHDR_SIZE);
-			ihdrChunk = new Chunk(ihdrBytes);
+			ihdrChunk = extractChunk(iStream);
 			
 			// Image Information
 			imageInformation = new ImageInformation(ihdrChunk.getData());
 			
 			// Intermediate Chunks
 			for(int i = 0; i < 4; i++) {
-				byte[] chunkLengthBytes = iStream.readNBytes(4);
-				int chunkLengthInt = Chunk.getLengthFromBytes(chunkLengthBytes);
-				iStream.readNBytes(chunkLengthInt);
+				miscChunks.add(extractChunk(iStream));
 			}
 			
 			// IDAT Chunk
-			byte[] idatLengthBytes = iStream.readNBytes(4);
-			int idatLengthInt = Chunk.getLengthFromBytes(idatLengthBytes);
-			byte[] remainingIdatBytes = iStream.readNBytes(idatLengthInt);
-			
-			byte[] idatComplete = new byte[4 + remainingIdatBytes.length];
-			
-			int i = 0;
-			for(byte b : idatLengthBytes) {
-				idatComplete[i] = b;
-				i++;
-			}
-			for(byte b : remainingIdatBytes) {
-				idatComplete[i] = b;
-				i++;
-			}
-			
-			idatChunk = new Chunk(idatComplete);	
+			idatChunk = extractChunk(iStream);
 			
 			// IDEND Chunk
-			byte[] iendLengthBytes = iStream.readNBytes(4);
-			int iendLengthInt = Chunk.getLengthFromBytes(iendLengthBytes);
-			byte[] remainingIendBytes = iStream.readNBytes(iendLengthInt);
-			
-			byte[] iendComplete = new byte[4 + remainingIendBytes.length];
-			
-			i = 0;
-			for(byte b : iendLengthBytes) {
-				iendComplete[i] = b;
-				i++;
-			}
-			for(byte b : remainingIendBytes) {
-				iendComplete[i] = b;
-				i++;
-			}
-			
-			iendChunk = new Chunk(iendComplete);	
+			iendChunk = extractChunk(iStream);
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private Chunk extractChunk(InputStream iStream) {
+		try {
+			byte[] lengthBytes = iStream.readNBytes(4);
+			int lengthInt = Chunk.getLengthFromBytes(lengthBytes);
+			byte[] remainingBytes = iStream.readNBytes(lengthInt);
+			
+			byte[] complete = new byte[4 + remainingBytes.length];
+			
+			int i = 0;
+			for(byte b : lengthBytes) {
+				complete[i] = b;
+				i++;
+			}
+			for(byte b : remainingBytes) {
+				complete[i] = b;
+				i++;
+			}
+			
+			return new Chunk(complete);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	public void printIHDRChunk() {
