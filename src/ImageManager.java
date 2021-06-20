@@ -52,7 +52,7 @@ public class ImageManager {
 	private Chunk extractChunk(InputStream iStream) {
 		try {
 			byte[] lengthBytes = iStream.readNBytes(4);
-			int lengthInt = Chunk.getLengthFromBytes(lengthBytes);
+			int lengthInt = Chunk.getLengthFromBytes(lengthBytes) + 8;
 			byte[] remainingBytes = iStream.readNBytes(lengthInt);
 			
 			byte[] complete = new byte[4 + remainingBytes.length];

@@ -1,43 +1,34 @@
 
 public class Chunk {
-	private int length;
-	private int chunkType;
+	private byte[] length = new byte[4];
+	private byte[] chunkType = new byte[4];
 	private byte[] data;
-	private int crc32;
+	private byte[] crc32 = new byte[4];
 	
 	public Chunk(byte[] bytes) {
 		// Length is first 4 bytes
-		int d1 = (bytes[0] & 0xff) << 24;
-		int d2 = (bytes[1] & 0xff) << 16;
-		int d3 = (bytes[2] & 0xff) << 8;
-		int d4 = (bytes[3] & 0xff);
-
-		length = d1 | d2 | d3 | d4;
+		for(int i = 0; i < 4; i++) {
+			length[i] = bytes[i];
+		}
 		
 		// Chunk type is next 4 bytes
-		d1 = (bytes[4] & 0xff) << 24;
-		d2 = (bytes[5] & 0xff) << 16;
-		d3 = (bytes[6] & 0xff) << 8;
-		d4 = (bytes[7] & 0xff);
-
-		chunkType = d1 | d2 | d3 | d4;
+		for(int i = 4; i < 8; i++) {
+			chunkType[i - 4] = bytes[i];
+		}
 		
 		// Data is "length" bytes
-		int dataStartIndex = 8;
-		data = new byte[length];
+		int chunkLength = Chunk.getLengthFromBytes(length) + 8;
+		data = new byte[chunkLength];
 		
-		for(int i = dataStartIndex; i < dataStartIndex + length; i++) {
-			data[i - dataStartIndex] = bytes[i];
+		for(int i = 8; i < chunkLength; i++) {
+			data[i - 8] = bytes[i];
 		}
 
 		// CRC-32 is the last 4 bytes
-		int endIndex = bytes.length - 1;
-		d1 = (bytes[endIndex - 3] & 0xff) << 24;
-		d2 = (bytes[endIndex - 2] & 0xff) << 16;
-		d3 = (bytes[endIndex - 1] & 0xff) << 8;
-		d4 = (bytes[endIndex] & 0xff);
-
-		crc32 = d1 | d2 | d3 | d4;
+		int endIndex = bytes.length;
+		for(int i = endIndex - 4; i < endIndex; i++) {
+			crc32[i - endIndex + 4] = bytes[i];
+		}
 	}
 	
 	public static int getLengthFromBytes(byte[] lengthBytes) {
@@ -46,7 +37,7 @@ public class Chunk {
 		int d3 = (lengthBytes[2] & 0xff) << 8;
 		int d4 = (lengthBytes[3] & 0xff);
 
-		return (d1 | d2 | d3 | d4) + 8;  
+		return (d1 | d2 | d3 | d4);  
 	}
 	
 	public byte[] getData() {
@@ -57,9 +48,19 @@ public class Chunk {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("-Chunk-");
 		
-		sb.append("\nLength: " + length);
-		sb.append("\nChunk Type: 0x" + Integer.toHexString(chunkType));
-		sb.append("\nCRC32: 0x" + Integer.toHexString(crc32));
+		sb.append("\nLength: " + Chunk.getLengthFromBytes(length));
+		
+		sb.append("\nChunk Type:");
+		for(byte b : chunkType) {
+			int lastEight = b & 0xff;
+			sb.append(" 0x" + Integer.toHexString(lastEight));
+		}
+		
+		sb.append("\nCRC32:");
+		for(byte b : crc32) {
+			int lastEight = b & 0xff;
+			sb.append(" 0x" + Integer.toHexString(lastEight));
+		}
 		sb.append("\n");
 		
 		return sb.toString();
