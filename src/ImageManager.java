@@ -14,7 +14,9 @@ public class ImageManager {
 	private ImageInformation imageInformation;
 	private byte[] header = new byte[HEADER_SIZE];
 	private Chunk ihdrChunk;
+	private Chunk[] miscChunks;
 	private Chunk idatChunk;
+	private Chunk iendChunk;
 	
 	public ImageManager(String fileName) {
 		path = new File(fileName);
@@ -32,7 +34,7 @@ public class ImageManager {
 			// Image Information
 			imageInformation = new ImageInformation(ihdrChunk.getData());
 			
-			// Intermediate Chunk
+			// Intermediate Chunks
 			for(int i = 0; i < 4; i++) {
 				byte[] chunkLengthBytes = iStream.readNBytes(4);
 				int chunkLengthInt = Chunk.getLengthFromBytes(chunkLengthBytes);
@@ -56,7 +58,26 @@ public class ImageManager {
 				i++;
 			}
 			
-			idatChunk = new Chunk(idatComplete);		
+			idatChunk = new Chunk(idatComplete);	
+			
+			// IDEND Chunk
+			byte[] iendLengthBytes = iStream.readNBytes(4);
+			int iendLengthInt = Chunk.getLengthFromBytes(iendLengthBytes);
+			byte[] remainingIendBytes = iStream.readNBytes(iendLengthInt);
+			
+			byte[] iendComplete = new byte[4 + remainingIendBytes.length];
+			
+			i = 0;
+			for(byte b : iendLengthBytes) {
+				iendComplete[i] = b;
+				i++;
+			}
+			for(byte b : remainingIendBytes) {
+				iendComplete[i] = b;
+				i++;
+			}
+			
+			iendChunk = new Chunk(iendComplete);	
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -69,6 +90,10 @@ public class ImageManager {
 	
 	public void printIDATChunk() {
 		System.out.println(idatChunk);
+	}
+	
+	public void printIENDChunk() {
+		System.out.println(iendChunk);
 	}
 	
 	public void printImagePixelData() {
