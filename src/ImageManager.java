@@ -27,7 +27,7 @@ public class ImageManager {
 			
 			// IHDR Chunk
 			byte[] ihdrBytes = iStream.readNBytes(IHDR_SIZE);
-			ihdrChunk = new Chunk("IHDR", ihdrBytes);
+			ihdrChunk = new Chunk(ihdrBytes);
 			
 			// Image Information
 			imageInformation = new ImageInformation(ihdrChunk.getData());
@@ -56,7 +56,7 @@ public class ImageManager {
 				i++;
 			}
 			
-			idatChunk = new Chunk("IDAT", idatComplete);		
+			idatChunk = new Chunk(idatComplete);		
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -88,7 +88,7 @@ public class ImageManager {
 		
 		for(byte b : header) {
 			int lastEight = b & 0xff;
-			sb.append(lastEight + " ");
+			sb.append("0x" + Integer.toHexString(lastEight) + " ");
 		}
 		sb.append("\n");
 		
