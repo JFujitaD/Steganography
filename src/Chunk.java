@@ -50,6 +50,10 @@ public class Chunk {
 		return data;
 	}
 	
+	public void setData(byte[] data) {
+		this.data = data;
+	}
+	
 	public byte[] getLengthData() {
 		return length;
 	}

@@ -7,7 +7,8 @@ public class Steganography {
 		im.printImageInformation();
 		im.printChunks();
 		
-		im.printImagePixelData();
+		//im.printImagePixelData();
+		im.injectMessage("Hello!");
 		im.reconstructImage("new-image.png");
 	}
 

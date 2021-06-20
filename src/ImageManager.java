@@ -66,6 +66,16 @@ public class ImageManager {
 		return null;
 	}
 	
+	public void injectMessage(String message) {
+		byte[] pixels;
+		for(Chunk c : chunks) {
+			if(c.isIDAT())
+				pixels = c.getData();
+		}
+		
+		
+	}
+	
 	public void reconstructImage(String imageName) {
 		byte[] newImage;
 		int totalBytes = 0;
