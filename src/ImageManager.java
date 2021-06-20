@@ -34,9 +34,9 @@ public class ImageManager {
 			imageInformation = new ImageInformation(ihdrChunk.getData());
 			
 			// Intermediate Chunks
-			for(int i = 0; i < 4; i++) {
-				miscChunks.add(extractChunk(iStream));
-			}
+//			for(int i = 0; i < 4; i++) {
+//				miscChunks.add(extractChunk(iStream));
+//			}
 			
 			// IDAT Chunk
 			idatChunk = extractChunk(iStream);
