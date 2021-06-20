@@ -79,7 +79,8 @@ public class ImageManager {
 		
 		Random r = new Random();
 		for(int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0b00000000;
+			if(r.nextBoolean())
+				pixels[i] = (byte) 0b10101010;
 		}
 		
 		idatChunk.setData(pixels);

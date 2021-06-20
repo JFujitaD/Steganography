@@ -58,9 +58,32 @@ public class Chunk {
 	
 	private void recalculateCRC() {
 		CRC32 c = new CRC32();
-		c.update(crc32);
+		byte[] typeAndData = new byte[chunkType.length + data.length];
+		int i = 0;
 		
-		System.out.println(Long.toHexString(c.getValue()));
+		for(byte b : chunkType) {
+			typeAndData[i] = b;
+			i++;
+		}
+		for(byte b : data) {
+			typeAndData[i] = b;
+			i++;
+		}
+		
+		c.update(typeAndData);
+		
+		// Change long(8 bytes) into byte[4]
+		long value = c.getValue();
+		
+		byte d1 = (byte) ((value & 0xff000000) >> 24);
+		byte d2 = (byte) ((value & 0x00ff0000) >> 16);
+		byte d3 = (byte) ((value & 0x0000ff00) >> 8);
+		byte d4 = (byte) (value & 0x000000ff);
+		
+		crc32[0] = (byte) (d1 & 0xff);
+		crc32[1] = (byte) (d2 & 0xff);
+		crc32[2] = (byte) (d3 & 0xff);
+		crc32[3] = (byte) (d4 & 0xff);
 	}
 	
 	public byte[] getLengthData() {
