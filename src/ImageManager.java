@@ -9,10 +9,7 @@ public class ImageManager {
 	
 	private ImageInformation imageInformation;
 	private byte[] header = new byte[HEADER_SIZE];
-	private Chunk ihdrChunk;
-	private List<Chunk> miscChunks = new ArrayList<>();
-	private Chunk idatChunk;
-	private Chunk iendChunk;
+	private List<Chunk> chunks = new ArrayList<>();
 	
 	public ImageManager(String fileName) {
 		path = new File(fileName);
@@ -23,22 +20,17 @@ public class ImageManager {
 			// Header
 			header = iStream.readNBytes(HEADER_SIZE);
 			
-			// IHDR Chunk
-			ihdrChunk = extractChunk(iStream);
-			
-			// Image Information
-			imageInformation = new ImageInformation(ihdrChunk.getData());
-			
-			// Intermediate Chunks
-//			for(int i = 0; i < 4; i++) {
-//				miscChunks.add(extractChunk(iStream));
-//			}
-			
-			// IDAT Chunk
-			idatChunk = extractChunk(iStream);
-			
-			// IDEND Chunk
-			iendChunk = extractChunk(iStream);
+			// Chunks
+			Chunk chunk;
+			while(true) {
+				chunk = extractChunk(iStream);
+				chunks.add(chunk);
+				
+				if(chunk.isIHDR())
+					imageInformation = new ImageInformation(chunk.getData());
+				if(chunk.isIEND())
+					break;
+			}
 			
 			iStream.close();
 		} 
@@ -80,12 +72,9 @@ public class ImageManager {
 		
 		// Calculate total bytes
 		totalBytes += header.length;
-		totalBytes += ihdrChunk.getBytes().length;
-		for(Chunk c : miscChunks) {
+		for(Chunk c : chunks) {
 			totalBytes += c.getBytes().length;
 		}
-		totalBytes += idatChunk.getBytes().length;
-		totalBytes += iendChunk.getBytes().length;
 		
 		// Fill bytes in the correct order
 		newImage = new byte[totalBytes];
@@ -96,27 +85,12 @@ public class ImageManager {
 			newImage[i] = header[i];
 			pointer++;
 		}
-		// IHDR Chunk
-		for(byte b : ihdrChunk.getBytes()) {
-			newImage[pointer] = b;
-			pointer++;
-		}
-		// Misc Chunks
-		for(Chunk c : miscChunks) {
+		// Chunks
+		for(Chunk c : chunks) {
 			for(byte b : c.getBytes()) {
 				newImage[pointer] = b;
 				pointer++;
 			}
-		}
-		// IDAT Chunk
-		for(byte b : idatChunk.getBytes()) {
-			newImage[pointer] = b;
-			pointer++;
-		}
-		// IEND Chunk
-		for(byte b : iendChunk.getBytes()) {
-			newImage[pointer] = b;
-			pointer++;
 		}
 		
 		// Save image
@@ -131,26 +105,22 @@ public class ImageManager {
 			e.printStackTrace();
 		}
 	}
-	
-	public void printIHDRChunk() {
-		System.out.println(ihdrChunk);
-	}
-	
-	public void printIDATChunk() {
-		System.out.println(idatChunk);
-	}
-	
-	public void printIENDChunk() {
-		System.out.println(iendChunk);
-	}
-	
-	public void printMiscChunks() {
-		for(Chunk c : miscChunks)
+		
+	public void printChunks() {
+		for(Chunk c : chunks)
 			System.out.println(c);
 	}
 	
 	public void printImagePixelData() {
 		StringBuilder sb = new StringBuilder("-Image Pixel Data-\n");
+		Chunk idatChunk = null;
+		for(Chunk c : chunks) {
+			if(c.isIDAT()) {
+				idatChunk = c;
+				break;
+			}	
+		}
+		
 		byte[] data = idatChunk.getData();
 		
 		for(byte d : data) {
