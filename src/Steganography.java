@@ -5,6 +5,8 @@ public class Steganography {
 		// TODO Auto-generated method stub
 		ImageManager im = new ImageManager("src/3x3.png");
 		im.printHeader();
+		im.printDimensions();
+		im.printBitDepth();
 	}
 
 }
