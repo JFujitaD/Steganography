@@ -24,7 +24,9 @@ public class ImageManager {
 			iStream = new FileInputStream(path);
 			
 			header = iStream.readNBytes(HEADER_SIZE);
+			iStream.readNBytes(8);
 			ihdr = iStream.readNBytes(IHDR_SIZE);
+			
 			extractDimensions();
 			extractBiDepth();
 			extractColorType();
