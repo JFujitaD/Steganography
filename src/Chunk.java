@@ -1,11 +1,15 @@
 
 public class Chunk {
+	private String name;
 	private int length;
 	private int chunkType;
 	private byte[] data;
 	private int crc32;
 	
-	public Chunk(byte[] bytes) {
+	public Chunk(String name, byte[] bytes) {
+		// Identifier
+		this.name = name;
+		
 		// Length is first 4 bytes
 		int d1 = (bytes[0] & 0xff) << 24;
 		int d2 = (bytes[1] & 0xff) << 16;
@@ -40,7 +44,28 @@ public class Chunk {
 		crc32 = d1 | d2 | d3 | d4;
 	}
 	
+	public static int getLengthFromBytes(byte[] lengthBytes) {
+		int d1 = (lengthBytes[0] & 0xff) << 24;
+		int d2 = (lengthBytes[1] & 0xff) << 16;
+		int d3 = (lengthBytes[2] & 0xff) << 8;
+		int d4 = (lengthBytes[3] & 0xff);
+
+		return (d1 | d2 | d3 | d4) + 8;  
+	}
+	
 	public byte[] getData() {
 		return data;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("-" + name + " Chunk-");
+		
+		sb.append("\nLength: " + length);
+		sb.append("\nChunk Type: 0x" + Integer.toHexString(chunkType));
+		sb.append("\nCRC32: 0x" + Integer.toHexString(crc32));
+		sb.append("\n");
+		
+		return sb.toString();
 	}
 }

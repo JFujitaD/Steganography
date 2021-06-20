@@ -6,10 +6,11 @@ public class ImageManager {
 	
 	private File path;
 	private InputStream iStream;
-	private ImageInformation imageInformation;
 	
+	private ImageInformation imageInformation;
 	private byte[] header = new byte[HEADER_SIZE];
 	private Chunk ihdrChunk;
+	private Chunk idatChunk;
 	
 	public ImageManager(String fileName) {
 		path = new File(fileName);
@@ -20,17 +21,55 @@ public class ImageManager {
 			// Header
 			header = iStream.readNBytes(HEADER_SIZE);
 			
-			// IHDR
+			// IHDR Chunk
 			byte[] ihdrBytes = iStream.readNBytes(IHDR_SIZE);
-			ihdrChunk = new Chunk(ihdrBytes);
+			ihdrChunk = new Chunk("IHDR", ihdrBytes);
 			
 			// Image Information
 			imageInformation = new ImageInformation(ihdrChunk.getData());
 			
+			// IDAT Chunk
+			byte[] idatLengthBytes = iStream.readNBytes(4);
+			int idatLengthInt = Chunk.getLengthFromBytes(idatLengthBytes);
+			byte[] remainingIdatBytes = iStream.readNBytes(idatLengthInt);
+			
+			byte[] idatComplete = new byte[4 + remainingIdatBytes.length];
+			
+			int i = 0;
+			for(byte b : idatLengthBytes) {
+				idatComplete[i] = b;
+				i++;
+			}
+			for(byte b : remainingIdatBytes) {
+				idatComplete[i] = b;
+				i++;
+			}
+			
+			idatChunk = new Chunk("IDAT", idatComplete);		
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void printIHDRChunk() {
+		System.out.println(ihdrChunk);
+	}
+	
+	public void printIDATChunk() {
+		System.out.println(idatChunk);
+	}
+	
+	public void printImagePixelData() {
+		StringBuilder sb = new StringBuilder("-Image Pixel Data-\n");
+		byte[] data = idatChunk.getData();
+		
+		for(byte d : data) {
+			int lastEight = d & 0xff;
+			sb.append(lastEight + "\n");
+		}
+
+		System.out.println(sb.toString());
 	}
 	
 	public void printImageHeader() {
