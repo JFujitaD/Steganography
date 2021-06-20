@@ -84,6 +84,11 @@ public class Chunk {
 		crc32[1] = (byte) (d2 & 0xff);
 		crc32[2] = (byte) (d3 & 0xff);
 		crc32[3] = (byte) (d4 & 0xff);
+		
+		System.out.println("-CRC32 Value-");
+		for(byte b : crc32) {
+			System.out.println(Integer.toHexString(b & 0xff));
+		}
 	}
 	
 	public byte[] getLengthData() {
