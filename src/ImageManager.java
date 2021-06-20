@@ -9,6 +9,10 @@ public class ImageManager {
 	private int width = 0;
 	private int height = 0;
 	private int bitDepth = 0;
+	private int colorType = 0;
+	private int compressionMethod = 0;
+	private int filterMethod = 0;
+	private int interlaceMethod = 0;
 	
 	private byte[] header = new byte[HEADER_SIZE];
 	private byte[] ihdr = new byte[IHDR_SIZE];
@@ -23,6 +27,10 @@ public class ImageManager {
 			ihdr = iStream.readNBytes(IHDR_SIZE);
 			extractDimensions();
 			extractBiDepth();
+			extractColorType();
+			extractCompressionMethod();
+			extractFilterMethod();
+			extractInterlaceMethod();
 			
 		} 
 		catch (Exception e) {
@@ -51,27 +59,39 @@ public class ImageManager {
 		
 	}
 	
+	private void extractColorType() {
+		colorType = ihdr[9] & 0xff;
+	}
 	
-	public void printHeader() {
-		System.out.println("-Image Header-");
+	private void extractCompressionMethod() {
+		compressionMethod = ihdr[10] & 0xff;
+	}
+	
+	private void extractFilterMethod() {
+		filterMethod = ihdr[11] & 0xff;
+	}
+	
+	private void extractInterlaceMethod() {
+		interlaceMethod = ihdr[12] & 0xff;
+	}
+	
+	public void printImageData() {
+		System.out.println("-Image Data-");
 		
+		System.out.print("Header: ");
 		for(byte b : header) {
 			int lastEight = b & 0xff;
 			System.out.print(lastEight + " ");
 		}
-		System.out.println("\n");
-	}
-	
-	public void printDimensions() {
-		System.out.println("-Image Dimensions-");
+		System.out.println();
+		
 		System.out.println("Width: " + width);
 		System.out.println("Height: " + height);
-		System.out.println("\n");
-	}
-	
-	public void printBitDepth() {
-		System.out.println("-Image Bit Depth-");
-		System.out.println("Type: " + bitDepth);
-		System.out.println("\n");
+		
+		System.out.println("Bit Depth: " + bitDepth);
+		System.out.println("Color Type: " + colorType);
+		System.out.println("Compression Method: " + compressionMethod);
+		System.out.println("Filter Method: " + filterMethod);
+		System.out.println("Interlace Method: " + interlaceMethod);
 	}
 }
