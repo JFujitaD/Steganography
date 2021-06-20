@@ -10,6 +10,7 @@ public class Steganography {
 		im.printIENDChunk();
 		
 		im.printImagePixelData();
+		im.reconstructImage("new-image.png");
 	}
 
 }

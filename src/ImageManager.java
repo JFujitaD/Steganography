@@ -43,6 +43,8 @@ public class ImageManager {
 			
 			// IDEND Chunk
 			iendChunk = extractChunk(iStream);
+			
+			iStream.close();
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
@@ -76,7 +78,7 @@ public class ImageManager {
 		return null;
 	}
 	
-	private void reconstructImage(String imageName) {
+	public void reconstructImage(String imageName) {
 		byte[] newImage;
 		int totalBytes = 0;
 		
@@ -96,7 +98,7 @@ public class ImageManager {
 		// Header
 		for(int i = pointer; i < HEADER_SIZE; i++) {
 			newImage[i] = header[i];
-			pointer = i;
+			pointer++;
 		}
 		// IHDR Chunk
 		for(byte b : ihdrChunk.getBytes()) {
@@ -122,6 +124,16 @@ public class ImageManager {
 		}
 		
 		// Save image
+		File path = new File("src/Images/" + imageName);
+		
+		try {
+			OutputStream oStream = new FileOutputStream(path);
+			oStream.write(newImage);
+			oStream.close();
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public void printIHDRChunk() {
