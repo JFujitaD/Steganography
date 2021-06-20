@@ -76,6 +76,54 @@ public class ImageManager {
 		return null;
 	}
 	
+	private void reconstructImage(String imageName) {
+		byte[] newImage;
+		int totalBytes = 0;
+		
+		// Calculate total bytes
+		totalBytes += header.length;
+		totalBytes += ihdrChunk.getBytes().length;
+		for(Chunk c : miscChunks) {
+			totalBytes += c.getBytes().length;
+		}
+		totalBytes += idatChunk.getBytes().length;
+		totalBytes += iendChunk.getBytes().length;
+		
+		// Fill bytes in the correct order
+		newImage = new byte[totalBytes];
+		int pointer = 0;
+		
+		// Header
+		for(int i = pointer; i < HEADER_SIZE; i++) {
+			newImage[i] = header[i];
+			pointer = i;
+		}
+		// IHDR Chunk
+		for(byte b : ihdrChunk.getBytes()) {
+			newImage[pointer] = b;
+			pointer++;
+		}
+		// Misc Chunks
+		for(Chunk c : miscChunks) {
+			for(byte b : c.getBytes()) {
+				newImage[pointer] = b;
+				pointer++;
+			}
+		}
+		// IDAT Chunk
+		for(byte b : idatChunk.getBytes()) {
+			newImage[pointer] = b;
+			pointer++;
+		}
+		// IEND Chunk
+		for(byte b : iendChunk.getBytes()) {
+			newImage[pointer] = b;
+			pointer++;
+		}
+		
+		// Save image
+	}
+	
 	public void printIHDRChunk() {
 		System.out.println(ihdrChunk);
 	}

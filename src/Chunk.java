@@ -1,3 +1,4 @@
+import java.util.*;
 
 public class Chunk {
 	private byte[] length = new byte[4];
@@ -5,7 +6,12 @@ public class Chunk {
 	private byte[] data;
 	private byte[] crc32 = new byte[4];
 	
+	private byte[] collectiveBytes;
+	
 	public Chunk(byte[] bytes) {
+		// Save original bytes
+		collectiveBytes = bytes;
+		
 		// Length is first 4 bytes
 		for(int i = 0; i < 4; i++) {
 			length[i] = bytes[i];
@@ -42,6 +48,14 @@ public class Chunk {
 	
 	public byte[] getData() {
 		return data;
+	}
+	
+	public byte[] getLengthData() {
+		return length;
+	}
+	
+	public byte[] getBytes() {
+		return collectiveBytes;
 	}
 	
 	@Override
