@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.zip.CRC32;
 
 public class Chunk {
 	private byte[] length = new byte[4];
@@ -52,6 +53,14 @@ public class Chunk {
 	
 	public void setData(byte[] data) {
 		this.data = data;
+		recalculateCRC();
+	}
+	
+	private void recalculateCRC() {
+		CRC32 c = new CRC32();
+		c.update(crc32);
+		
+		System.out.println(Long.toHexString(c.getValue()));
 	}
 	
 	public byte[] getLengthData() {
