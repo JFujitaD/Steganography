@@ -148,6 +148,11 @@ public class ImageManager {
 		System.out.println(iendChunk);
 	}
 	
+	public void printMiscChunks() {
+		for(Chunk c : miscChunks)
+			System.out.println(c);
+	}
+	
 	public void printImagePixelData() {
 		StringBuilder sb = new StringBuilder("-Image Pixel Data-\n");
 		byte[] data = idatChunk.getData();

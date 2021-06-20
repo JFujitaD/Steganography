@@ -6,6 +6,7 @@ public class Steganography {
 		im.printImageHeader();
 		im.printImageInformation();
 		im.printIHDRChunk();
+		im.printMiscChunks();
 		im.printIDATChunk();
 		im.printIENDChunk();
 		

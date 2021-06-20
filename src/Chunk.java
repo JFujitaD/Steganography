@@ -64,10 +64,10 @@ public class Chunk {
 		
 		sb.append("\nLength: " + Chunk.getLengthFromBytes(length));
 		
-		sb.append("\nChunk Type:");
+		sb.append("\nChunk Type: ");
 		for(byte b : chunkType) {
 			int lastEight = b & 0xff;
-			sb.append(" 0x" + Integer.toHexString(lastEight));
+			sb.append((char)lastEight);
 		}
 		
 		sb.append("\nCRC32:");
