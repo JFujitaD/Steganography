@@ -67,13 +67,22 @@ public class ImageManager {
 	}
 	
 	public void injectMessage(String message) {
-		byte[] pixels;
+		Chunk idatChunk = null;
+		byte[] pixels = null;
+		
 		for(Chunk c : chunks) {
-			if(c.isIDAT())
+			if(c.isIDAT()) {
+				idatChunk = c;
 				pixels = c.getData();
+			}
 		}
 		
+		Random r = new Random();
+		for(byte p : pixels) {
+			p = 0b00000000;
+		}
 		
+		idatChunk.setData(pixels);
 	}
 	
 	public void reconstructImage(String imageName) {
