@@ -6,11 +6,11 @@ public class Chunk {
 	private byte[] data;
 	private byte[] crc32 = new byte[4];
 	
-	private byte[] collectiveBytes;
+	private int byteCount = 0;
 	
-	public Chunk(byte[] bytes) {
-		// Save original bytes
-		collectiveBytes = bytes;
+	public Chunk(byte[] bytes) {	
+		// Keep track of byteCount
+		byteCount = bytes.length;
 		
 		// Length is first 4 bytes
 		for(int i = 0; i < 4; i++) {
@@ -59,7 +59,32 @@ public class Chunk {
 	}
 	
 	public byte[] getBytes() {
-		return collectiveBytes;
+		byte[] bytes = new byte[byteCount];
+		
+		// Length is first 4 bytes
+		for(int i = 0; i < 4; i++) {
+			bytes[i] = length[i];
+		}
+		
+		// Chunk type is next 4 bytes
+		for(int i = 4; i < 8; i++) {
+			bytes[i] = chunkType[i - 4];
+		}
+		
+		// Data is "length" bytes
+		int chunkLength = Chunk.getLengthFromBytes(length) + 8;
+		
+		for(int i = 8; i < chunkLength; i++) {
+			bytes[i] = data[i - 8];
+		}
+
+		// CRC-32 is the last 4 bytes
+		int endIndex = bytes.length;
+		for(int i = endIndex - 4; i < endIndex; i++) {
+			bytes[i] = crc32[i - endIndex + 4];
+		}
+		
+		return bytes;
 	}
 	
 	public boolean isIHDR() {
